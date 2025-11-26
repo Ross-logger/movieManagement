@@ -7,6 +7,10 @@ import java.util.Set;
 import movieManagement.src.movie.Movie;
 import movieManagement.src.movie.Review;
 import movieManagement.src.authentication.CredentialsCheck;
+import movieManagement.src.users.NonMemberState;
+import movieManagement.src.users.GoldMemberState;
+import movieManagement.src.users.PlatinumMemberState;
+import movieManagement.src.users.MembershipState;
 
 public class Customer extends User {
     private ArrayList<Movie> rentedMovies;
@@ -60,6 +64,23 @@ public class Customer extends User {
 
     public void addPurchasedMovie(Movie movie) {
         purchasedMovies.add(movie);
+        checkMembershipUpgrade();
+    }
+    
+    private void checkMembershipUpgrade() {
+        int purchaseCount = purchasedMovies.size();
+        MembershipState currentState = membership.getState();
+        
+        // Upgrade to Gold after 3 purchases
+        if (purchaseCount >= 3 && currentState instanceof NonMemberState) {
+            membership.setState(new GoldMemberState());
+            System.out.println("\n🎉 Congratulations! You've been upgraded to GOLD membership!");
+        }
+        // Upgrade to Platinum after 10 purchases
+        else if (purchaseCount >= 10 && currentState instanceof GoldMemberState) {
+            membership.setState(new PlatinumMemberState());
+            System.out.println("\n🎉 Congratulations! You've been upgraded to PLATINUM membership!");
+        }
     }
 
     public void addReview(Review review) {

@@ -12,6 +12,7 @@ import movieManagement.src.authentication.AuthService;
 import movieManagement.src.exceptions.*;
 import movieManagement.src.payment.*;
 import movieManagement.data.PredefinedMoviesList;
+import movieManagement.src.users.Membership;
 
 public class Main {
     private static List<Movie> movies = new ArrayList<>();
@@ -72,6 +73,9 @@ public class Main {
                         processRefund();
                         break;
                     case 11:
+                        viewMembership();
+                        break;
+                    case 12:
                         signOut();
                         break;
                     case 0:
@@ -90,7 +94,6 @@ public class Main {
         System.out.println("\n--- Authentication ---");
         System.out.println("1. Sign In");
         System.out.println("2. Register");
-        System.out.println("3. Sign In as Admin");
         System.out.println("0. Exit");
         System.out.println();
         
@@ -102,8 +105,6 @@ public class Main {
             case 2:
                 register();
                 return true;
-            case 3:
-                return signInAdmin();
             case 0:
                 return false;
             default:
@@ -151,19 +152,22 @@ public class Main {
         }
     }
 
-    private static boolean signInAdmin() {
-        System.out.println("\n--- Admin Sign In ---");
-        String password = getStringInput("Enter admin password: ");
-        
-        try {
-            Admin admin = authService.signInAdmin(password);
-            currentUser = admin;
-            System.out.println("\n✓ Successfully signed in as admin");
-            return true;
-        } catch (WrongPasswordException e) {
-            System.out.println("\n✗ " + e.getMessage());
-            return true;
+    private static void viewMembership() {
+        if (!(currentUser instanceof Customer)) {
+            System.out.println("\n✗ Only customers have memberships.");
+            return;
         }
+        
+        Customer customer = (Customer) currentUser;
+        Membership membership = customer.getMembership();
+        
+        System.out.println("\n--- My Membership ---");
+        System.out.println("Membership Type: " + membership.getType());
+        System.out.println("Max Rental Movies: " + membership.getMaxRentMovies());
+        System.out.println("Rental Days: " + membership.getRentalDays());
+        System.out.println("Purchase Discount: " + (membership.getState().getPurchaseDiscount() * 100) + "%");
+        System.out.println("\nCurrently Rented Movies: " + customer.getRentedMovies().size());
+        System.out.println("Purchased Movies: " + customer.getPurchasedMovies().size());
     }
 
     private static void signOut() {
@@ -189,7 +193,8 @@ public class Main {
         System.out.println("8. List all movies");
         System.out.println("9. Return a rented movie");
         System.out.println("10. Process refund");
-        System.out.println("11. Sign Out");
+        System.out.println("11. View my membership");
+        System.out.println("12. Sign Out");
         System.out.println("0. Exit");
         System.out.println();
     }
@@ -268,12 +273,31 @@ public class Main {
             return;
         }
 
+        Customer customer = (Customer) currentUser;
+        Membership membership = customer.getMembership();
+        int maxRentals = membership.getMaxRentMovies();
+        int currentRentals = customer.getRentedMovies().size();
+        
+        // Check if customer has reached max rental limit
+        if (currentRentals >= maxRentals) {
+            System.out.println("\n✗ Rental limit reached! You can rent a maximum of " + maxRentals + " movie(s) with your " + membership.getType() + " membership.");
+            System.out.println("Currently rented: " + currentRentals + " movie(s)");
+            System.out.println("Please return a movie before renting another one.");
+            return;
+        }
+
         System.out.println("\n--- Rent a Movie ---");
         Movie movie = selectMovie();
         if (movie != null) {
             System.out.println("\nAttempting to rent: " + movie.getDisplayText());
-            Customer customer = (Customer) currentUser;
+            // Check if movie has available rental copies
+            if (!movie.hasAvailableRentalCopy()) {
+                System.out.println("\n✗ No rental copies available for this movie.");
+                return;
+            }
             movie.Lend(customer);
+            // Add movie to customer's rented movies list
+            customer.addRentedMovie(movie);
             System.out.println("Available rental copies: " + movie.showAvailableRentalCopies());
         }
     }
@@ -326,6 +350,7 @@ public class Main {
                 if (transaction.isPaymentCompleted()) {
                     Customer customer = (Customer) currentUser;
                     movie.Buy(customer);
+                    customer.addPurchasedMovie(movie);
                     transactions.add(transaction);
                     System.out.println("Available sale copies: " + movie.showAvailableSellableCopies());
                 }
@@ -438,10 +463,51 @@ public class Main {
     }
 
     private static void returnMovie() {
+        if (!(currentUser instanceof Customer)) {
+            System.out.println("\n✗ Only customers can return movies.");
+            return;
+        }
+
+        Customer customer = (Customer) currentUser;
+        ArrayList<Movie> rentedMovies = customer.getRentedMovies();
+        
+        if (rentedMovies.isEmpty()) {
+            System.out.println("\n✗ You have no rented movies to return.");
+            return;
+        }
+
         System.out.println("\n--- Return a Rented Movie ---");
-        System.out.println("Note: This feature requires tracking rented copies.");
-        System.out.println("For demonstration purposes, please use the rental system");
-        System.out.println("to manage returns through the main interface.");
+        System.out.println("\nYour currently rented movies:");
+        for (int i = 0; i < rentedMovies.size(); i++) {
+            System.out.println((i + 1) + ". " + rentedMovies.get(i).getDisplayText());
+        }
+        System.out.println();
+        
+        int choice = getIntInput("Enter the number of the movie you want to return (0 to cancel): ");
+        
+        if (choice == 0) {
+            return;
+        }
+        
+        if (choice < 1 || choice > rentedMovies.size()) {
+            System.out.println("\n✗ Invalid choice. Please try again.");
+            return;
+        }
+        
+        Movie movieToReturn = rentedMovies.get(choice - 1);
+        System.out.println("\nReturning: " + movieToReturn.getDisplayText());
+        
+        // Return the movie - only remove from list if return was successful
+        boolean returnSuccess = movieToReturn.Return(customer);
+        
+        if (returnSuccess) {
+            // Remove from customer's rented movies list using index (more reliable)
+            customer.getRentedMovies().remove(choice - 1);
+            System.out.println("✓ Movie removed from your rented list.");
+            System.out.println("Available rental copies: " + movieToReturn.showAvailableRentalCopies());
+        } else {
+            System.out.println("\n✗ Failed to return movie. Please try again.");
+        }
     }
 
     private static Movie selectMovie() {

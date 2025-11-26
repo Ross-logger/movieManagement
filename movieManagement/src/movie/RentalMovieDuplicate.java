@@ -37,6 +37,10 @@ public class RentalMovieDuplicate extends MovieDuplicate {
 		this.customer = null;
 	}
 	
+	public Customer getCustomer() {
+		return customer;
+	}
+	
 	public void addRentalRecord(RentalRecord record) {
         if (record == null) {
             throw new IllegalArgumentException("Rental record cannot be null");

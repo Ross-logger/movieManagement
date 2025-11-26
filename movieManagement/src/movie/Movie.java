@@ -14,8 +14,6 @@ public class Movie {
     private int moviePrice;
     private List<RentalMovieDuplicate> rentalCopies; 
     private List<SalableMovieDuplicate> saleCopies; 
-    private ArrayList<Customer> rentingWaitList;
-    private ArrayList<Customer> sellingWaitList;
     private ArrayList<SalableMovieDuplicate> soldCopies;
     private List<Review> allReviews;
 
@@ -30,9 +28,19 @@ public class Movie {
         this.rentalCopies = new ArrayList<>();
         this.saleCopies = new ArrayList<>();
         this.soldCopies = new ArrayList<>();
-        this.rentingWaitList = new ArrayList<>();
-        this.sellingWaitList = new ArrayList<>();
         this.allReviews = new ArrayList<>();
+        initializeDefaultCopies();
+    }
+    
+    private void initializeDefaultCopies() {
+        // Add 10 rental copies
+        for (int i = 0; i < 10; i++) {
+            rentalCopies.add(new RentalMovieDuplicate(this));
+        }
+        // Add 10 sale copies
+        for (int i = 0; i < 10; i++) {
+            saleCopies.add(new SalableMovieDuplicate(this));
+        }
     }
     
     //selling movie
@@ -46,7 +54,6 @@ public class Movie {
     
     public void Buy(Customer customer) {
         if (!isSalable()) {
-        	addSellingWaitList(customer);
         	System.out.print("No movie available for selling.\n"); 
         }else{
         	SalableMovieDuplicate sellingCopy = saleCopies.remove(0);
@@ -57,10 +64,6 @@ public class Movie {
     	
     }
     
-    public void addSellingWaitList(Customer customer) {
-    	sellingWaitList.add(customer);
-	}
-    
     public List<SalableMovieDuplicate> getSoldCopies() {
         return new ArrayList<>(soldCopies);
     } 
@@ -69,7 +72,6 @@ public class Movie {
     public void Lend(Customer customer) {
     	RentalMovieDuplicate rentingCopy = getAvailableLendingCopy();
         if (rentingCopy == null) { 
-            addLendingWaitList(customer);
             System.out.print("No movie available for lending.\n"); 
         }else{
         	rentingCopy.rent(customer);
@@ -86,12 +88,32 @@ public class Movie {
     	}
 		return null;
 	}
-
-	public void addLendingWaitList(Customer customer) {
-    	rentingWaitList.add(customer);
-	}
+    
+    public boolean hasAvailableRentalCopy() {
+        return getAvailableLendingCopy() != null;
+    }
+    
+    public RentalMovieDuplicate getRentedCopyByCustomer(Customer customer) {
+        for (RentalMovieDuplicate copy: this.rentalCopies) {
+            if (copy.isRented() && copy.getCustomer() != null && copy.getCustomer() == customer) {
+                return copy;
+            }
+        }
+        return null;
+    }
+    
+    public boolean Return(Customer customer) {
+        RentalMovieDuplicate rentedCopy = getRentedCopyByCustomer(customer);
+        if (rentedCopy == null) {
+            System.out.print("You have not rented this movie.\n");
+            return false;
+        } else {
+            rentedCopy.returnMovie();
+            System.out.print("Movie returned successfully.\n");
+            return true;
+        }
+    }
 	
-
     //rental copies add & get
     public String showAvailableRentalCopies() {
     	int availableCount = 0;
