@@ -12,12 +12,14 @@ public class Customer extends User {
     private ArrayList<Movie> rentedMovies;
     private ArrayList<Movie> purchasedMovies;
     private Set<Review> reviews;
+    private Membership membership;
 
     public Customer(String username, CredentialsCheck credential) {
         super(username, credential);
         this.rentedMovies = new ArrayList<>();
         this.purchasedMovies = new ArrayList<>();
         this.reviews = new HashSet<>();
+        this.membership = new Membership();
     }
     
     public Customer(String username) {
@@ -25,6 +27,7 @@ public class Customer extends User {
         this.rentedMovies = new ArrayList<>();
         this.purchasedMovies = new ArrayList<>();
         this.reviews = new HashSet<>();
+        this.membership = new Membership();
     }
 
     public Customer(String username, Integer id) {
@@ -32,6 +35,7 @@ public class Customer extends User {
         this.rentedMovies = new ArrayList<>();
         this.purchasedMovies = new ArrayList<>();
         this.reviews = new HashSet<>();
+        this.membership = new Membership();
     }
 
     public ArrayList<Movie> getRentedMovies() {
@@ -60,6 +64,14 @@ public class Customer extends User {
 
     public void addReview(Review review) {
         reviews.add(review);
+    }
+
+    public Membership getMembership() {
+        return membership;
+    }
+
+    public void setMembership(MembershipState newState) {
+        membership.setState(newState);
     }
 }
 

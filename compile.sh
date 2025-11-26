@@ -22,4 +22,12 @@ if [ -d "movieManagement/testMovie" ]; then
     fi
 fi
 
+# Compile user tests
+if [ -d "movieManagement/test/users" ]; then
+    USER_TEST_FILES=$(find movieManagement/test/users -name "*.java" | tr '\n' ' ')
+    if [ -n "$USER_TEST_FILES" ]; then
+        javac -cp "$CLASSPATH:build/classes" -d build/test-classes $USER_TEST_FILES
+    fi
+fi
+
 echo "Compilation complete!"
