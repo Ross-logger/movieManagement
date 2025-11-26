@@ -3,6 +3,7 @@ package movieManagement.src.authentication;
 import java.util.ArrayList;
 import movieManagement.src.exceptions.*;
 import movieManagement.src.users.*;
+import movieManagement.data.PredefinedAdmins;
 
 public class AuthService {
     private static Admin admin = Admin.getInstance();
@@ -12,6 +13,11 @@ public class AuthService {
 
     private AuthService() {
         AuthService.registeredUsers = new ArrayList<User>();
+        // Register all predefined admins
+        Admin[] admins = PredefinedAdmins.loadAdmins();
+        for (Admin predefinedAdmin : admins) {
+            registeredUsers.add(predefinedAdmin);
+        }
     }
 
     public static AuthService getInstance() {

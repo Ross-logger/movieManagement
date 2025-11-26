@@ -1,7 +1,6 @@
 package movieManagement.src.users;
 
 import java.util.List;
-
 import movieManagement.src.movie.Movie;
 import movieManagement.src.authentication.CredentialsCheck;
 import movieManagement.data.PredefinedAdmins;
@@ -16,10 +15,6 @@ public class Admin extends User {
     public static synchronized Admin getInstance() {
         if (instance == null) {
             instance = PredefinedAdmins.loadAdmin();
-            if (instance == null) {
-                // No admins are loaded, PredefinedAdmins is empty
-                throw new IllegalStateException("No admins are loaded. Add admins to PredefinedAdmins.java file.");
-            }
         }
         return instance;
     }
@@ -42,4 +37,3 @@ public class Admin extends User {
         }
     }
 }
-

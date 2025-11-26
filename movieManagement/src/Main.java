@@ -118,8 +118,13 @@ public class Main {
         String password = getStringInput("Enter password: ");
         
         try {
-            currentUser = authService.signIn(username, password);
-            System.out.println("\n✓ Successfully signed in as: " + currentUser.getUsername());
+            User user = authService.signIn(username, password);
+            currentUser = user;
+            if (user instanceof Admin) {
+                System.out.println("\n✓ Successfully signed in as admin: " + currentUser.getUsername());
+            } else {
+                System.out.println("\n✓ Successfully signed in as: " + currentUser.getUsername());
+            }
             return true;
         } catch (UsernameNotFoundException e) {
             System.out.println("\n✗ " + e.getMessage());
