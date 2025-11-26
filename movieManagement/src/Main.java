@@ -2,6 +2,7 @@ package movieManagement.src;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -76,6 +77,15 @@ public class Main {
                         viewMembership();
                         break;
                     case 12:
+                        viewRentedMovies();
+                        break;
+                    case 13:
+                        viewPurchasedMovies();
+                        break;
+                    case 14:
+                        viewMyReviews();
+                        break;
+                    case 15:
                         signOut();
                         break;
                     case 0:
@@ -170,6 +180,106 @@ public class Main {
         System.out.println("Purchased Movies: " + customer.getPurchasedMovies().size());
     }
 
+    private static void viewRentedMovies() {
+        if (!(currentUser instanceof Customer)) {
+            System.out.println("\n✗ Only customers can view rented movies.");
+            return;
+        }
+        
+        Customer customer = (Customer) currentUser;
+        ArrayList<Movie> rentedMovies = customer.getRentedMovies();
+        
+        System.out.println("\n--- My Rented Movies ---");
+        System.out.println("=".repeat(50));
+        
+        if (rentedMovies.isEmpty()) {
+            System.out.println("You have no rented movies currently.");
+        } else {
+            System.out.println("Total rented movies: " + rentedMovies.size());
+            System.out.println();
+            for (int i = 0; i < rentedMovies.size(); i++) {
+                Movie movie = rentedMovies.get(i);
+                System.out.println((i + 1) + ". " + movie.getDisplayText());
+            }
+        }
+        System.out.println("=".repeat(50));
+    }
+
+    private static void viewPurchasedMovies() {
+        if (!(currentUser instanceof Customer)) {
+            System.out.println("\n✗ Only customers can view purchased movies.");
+            return;
+        }
+        
+        Customer customer = (Customer) currentUser;
+        ArrayList<Movie> purchasedMovies = customer.getPurchasedMovies();
+        
+        System.out.println("\n--- My Purchased Movies ---");
+        System.out.println("=".repeat(50));
+        
+        if (purchasedMovies.isEmpty()) {
+            System.out.println("You have no purchased movies currently.");
+        } else {
+            System.out.println("Total purchased movies: " + purchasedMovies.size());
+            System.out.println();
+            for (int i = 0; i < purchasedMovies.size(); i++) {
+                Movie movie = purchasedMovies.get(i);
+                System.out.println((i + 1) + ". " + movie.getDisplayText());
+            }
+        }
+        System.out.println("=".repeat(50));
+    }
+
+    private static void viewMyReviews() {
+        if (!(currentUser instanceof Customer)) {
+            System.out.println("\n✗ Only customers can view their reviews.");
+            return;
+        }
+        
+        Customer customer = (Customer) currentUser;
+        Set<Review> reviews = customer.getReviews();
+        
+        System.out.println("\n--- My Reviews ---");
+        System.out.println("=".repeat(50));
+        
+        if (reviews.isEmpty()) {
+            System.out.println("You have not written any reviews yet.");
+        } else {
+            System.out.println("Total reviews: " + reviews.size());
+            System.out.println();
+            
+            // Find which movie each review belongs to by searching through all movies
+            int reviewNum = 1;
+            for (Review review : reviews) {
+                // Find the movie this review belongs to
+                String movieTitle = "Unknown Movie";
+                for (Movie movie : movies) {
+                    // Check if this movie has this review by comparing comment and rating
+                    List<Review> movieReviews = movie.getAllReviews();
+                    if (movieReviews != null) {
+                        for (Review movieReview : movieReviews) {
+                            if (movieReview.getComments().equals(review.getComments()) && 
+                                movieReview.getMovieRating() == review.getMovieRating()) {
+                                movieTitle = movie.getDisplayText();
+                                break;
+                            }
+                        }
+                    }
+                    if (!movieTitle.equals("Unknown Movie")) {
+                        break;
+                    }
+                }
+                
+                System.out.println(reviewNum + ". Movie: " + movieTitle);
+                System.out.println("   Rating: " + review.getMovieRating() + "/10");
+                System.out.println("   Comment: " + review.getComments());
+                System.out.println();
+                reviewNum++;
+            }
+        }
+        System.out.println("=".repeat(50));
+    }
+
     private static void signOut() {
         try {
             authService.signOut(currentUser);
@@ -194,7 +304,10 @@ public class Main {
         System.out.println("9. Return a rented movie");
         System.out.println("10. Process refund");
         System.out.println("11. View my membership");
-        System.out.println("12. Sign Out");
+        System.out.println("12. View my rented movies");
+        System.out.println("13. View my purchased movies");
+        System.out.println("14. View my reviews");
+        System.out.println("15. Sign Out");
         System.out.println("0. Exit");
         System.out.println();
     }
@@ -425,6 +538,9 @@ public class Main {
 
             Review review = new Review(comment, rating);
             movie.addReview(review);
+            // Also add review to customer's review list
+            Customer customer = (Customer) currentUser;
+            customer.addReview(review);
             System.out.println("\n✓ Review added successfully!");
         }
     }

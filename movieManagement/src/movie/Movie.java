@@ -156,6 +156,10 @@ public class Movie {
         }
     }
     
+    public List<Review> getAllReviews() {
+        return new ArrayList<>(allReviews);
+    }
+    
     public int getMoviePrice() {
     	return this.moviePrice;
     }
