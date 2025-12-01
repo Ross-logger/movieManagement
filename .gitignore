@@ -2,6 +2,7 @@
 *.class
 build/
 target/
+bin/
 
 # IDE files
 .idea/
@@ -22,3 +23,4 @@ Thumbs.db
 .mvn/
 mvnw
 mvnw.cmd
+target/

@@ -1,57 +1,57 @@
 #!/bin/bash
-# Compile the Movie Management System with JUnit on classpath
 
-# Create classpath with all JUnit JARs
-CLASSPATH="lib/*"
+# Compile script for Movie Management System
+# This script compiles all Java source files
 
-# Find all Java files in movieManagement/src and movieManagement/data
-SOURCE_FILES=$(find movieManagement/src movieManagement/data -name "*.java" 2>/dev/null | tr '\n' ' ')
+echo "Compiling Movie Management System..."
+echo "======================================"
 
-# Compile movieManagement source files from src directory
-if [ -n "$SOURCE_FILES" ]; then
-    javac -cp "$CLASSPATH" -d build/classes $SOURCE_FILES
+# Create output directory if it doesn't exist
+mkdir -p target/classes
+
+# Clean previous compilation
+echo "Cleaning previous compilation..."
+rm -rf target/classes/*
+
+# Find all Java files in src directory
+echo "Finding source files..."
+find src -name "*.java" > sources.txt
+
+if [ ! -s sources.txt ]; then
+    echo "✗ No Java source files found in src/"
+    rm -f sources.txt
+    exit 1
+fi
+
+# Build classpath from lib directory
+CLASSPATH=""
+if [ -d "lib" ]; then
+    for jar in lib/*.jar; do
+        if [ -f "$jar" ]; then
+            if [ -z "$CLASSPATH" ]; then
+                CLASSPATH="$jar"
+            else
+                CLASSPATH="$CLASSPATH:$jar"
+            fi
+        fi
+    done
+fi
+
+# Compile all source files
+# Target Java 21 for Eclipse compatibility
+echo "Compiling (targeting Java 21)..."
+javac --release 21 -d target/classes -cp "$CLASSPATH" @sources.txt
+
+# Check if compilation was successful
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "✓ Compilation successful!"
+    echo "Compiled classes are in target/classes/"
+    rm -f sources.txt
 else
-    echo "No source files found in movieManagement/src"
+    echo ""
+    echo "✗ Compilation failed!"
+    rm -f sources.txt
+    exit 1
 fi
 
-# Compile test source
-if [ -d "movieManagement/testMovie" ]; then
-    TEST_FILES=$(find movieManagement/testMovie -name "*.java" | tr '\n' ' ')
-    if [ -n "$TEST_FILES" ]; then
-        javac -cp "$CLASSPATH:build/classes" -d build/test-classes $TEST_FILES
-    fi
-fi
-
-# Compile user tests
-if [ -d "movieManagement/test/users" ]; then
-    USER_TEST_FILES=$(find movieManagement/test/users -name "*.java" | tr '\n' ' ')
-    if [ -n "$USER_TEST_FILES" ]; then
-        javac -cp "$CLASSPATH:build/classes" -d build/test-classes $USER_TEST_FILES
-    fi
-fi
-
-# Compile movie tests
-if [ -d "movieManagement/test/movie" ]; then
-    MOVIE_TEST_FILES=$(find movieManagement/test/movie -name "*.java" | tr '\n' ' ')
-    if [ -n "$MOVIE_TEST_FILES" ]; then
-        javac -cp "$CLASSPATH:build/classes" -d build/test-classes $MOVIE_TEST_FILES
-    fi
-fi
-
-# Compile authentication tests
-if [ -d "movieManagement/test/authentication" ]; then
-    AUTH_TEST_FILES=$(find movieManagement/test/authentication -name "*.java" | tr '\n' ' ')
-    if [ -n "$AUTH_TEST_FILES" ]; then
-        javac -cp "$CLASSPATH:build/classes" -d build/test-classes $AUTH_TEST_FILES
-    fi
-fi
-
-# Compile payment tests
-if [ -d "movieManagement/test/payment" ]; then
-    PAYMENT_TEST_FILES=$(find movieManagement/test/payment -name "*.java" | tr '\n' ' ')
-    if [ -n "$PAYMENT_TEST_FILES" ]; then
-        javac -cp "$CLASSPATH:build/classes" -d build/test-classes $PAYMENT_TEST_FILES
-    fi
-fi
-
-echo "Compilation complete!"
