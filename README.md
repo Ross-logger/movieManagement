@@ -11,7 +11,6 @@ The Movie Management System is a library-style application that handles:
 - **Rental Operations**: Track movie rentals with borrowing history and due dates
 - **Sales Operations**: Manage movie purchases and track sold inventory
 - **Review System**: Allow customers to rate and review movies
-- **Waitlist Management**: Handle customer waitlists for unavailable movies
 
 ### Architecture & Design Patterns
 
@@ -26,7 +25,6 @@ This project showcases several important software engineering concepts:
 - **DRY (Don't Repeat Yourself)**: Common copy functionality centralized in `MovieDuplicate`
 - **Separation of Concerns**: Each class has a single, well-defined responsibility
 - **Polymorphism**: Different copy types can be treated uniformly through the base class
-- **Observer Pattern**: Foundation for waitlist notifications (stub implementation)
 
 ### Project Structure
 
@@ -40,9 +38,7 @@ src/
 │   │   ├── SalableMovieDuplicate.java # Sale copy implementation
 │   │   ├── RentalRecord.java     # Rental transaction history
 │   │   ├── Review.java           # Customer reviews and ratings
-│   │   ├── Observer.java         # Observer pattern base
 │   │   ├── Customer_stub.java    # Customer representation
-│   │   ├── Observer_stub.java    # Observer stub
 │   │   └── Review_stub.java      # Review stub
 │   ├── MovieManagementSystem.java # Console interface (main entry point)
 │   └── testMovie/                 # Test package
@@ -66,12 +62,10 @@ src/
    - Borrow movies with automatic due date calculation (7-day default)
    - Return movies to make them available again
    - Maintain rental history per copy
-   - Handle waitlists when no copies are available
 
 3. **Sales System**
    - Purchase movies permanently
    - Track sold inventory
-   - Manage purchase waitlists
 
 4. **Review System**
    - Add customer reviews with ratings (0-10 scale)
@@ -310,7 +304,7 @@ The project includes comprehensive unit tests:
   - Adding sale copies
   - Successful lending
   - Successful purchasing
-  - Handling unavailable copies (waitlist scenarios)
+  - Handling unavailable copies
 
 - **TestReview.java**: 4 test cases covering review functionality
   - Review creation
@@ -364,7 +358,6 @@ The interface will guide you through each operation step-by-step. Simply follow 
 
 - The system uses a 7-day default rental period for movies
 - Movie ratings are on a scale of 0-10
-- Waitlists are automatically managed when copies are unavailable
 - All copy IDs are generated using UUID for uniqueness
 - The console interface provides full system access without programming knowledge
 

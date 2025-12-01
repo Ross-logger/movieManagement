@@ -536,12 +536,16 @@ public class Main {
                 return;
             }
 
-            Review review = new Review(comment, rating);
-            movie.addReview(review);
-            // Also add review to customer's review list
             Customer customer = (Customer) currentUser;
-            customer.addReview(review);
-            System.out.println("\n✓ Review added successfully!");
+            Review review = new Review(comment, rating, customer);
+            boolean added = movie.addReview(review);
+            if (added) {
+                // Also add review to customer's review list
+                customer.addReview(review);
+                System.out.println("\n✓ Review added successfully!");
+            } else {
+                System.out.println("\n⚠ You already have a review for this movie. Use the edit option to update it.");
+            }
         }
     }
 

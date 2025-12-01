@@ -139,11 +139,52 @@ public class Movie {
     }
 
     //review add & get
-    public void addReview(Review review) {
+    public boolean addReview(Review review) {
         if (review == null) {
             throw new IllegalArgumentException("Review cannot be null.");
         }
+        if (review.getCustomer() == null) {
+            throw new IllegalArgumentException("Review must have a customer.");
+        }
+        
+        // Check if customer already has a review for this movie
+        Review existingReview = getReviewByCustomer(review.getCustomer());
+        if (existingReview != null) {
+            System.out.print("Review already exists. You can edit your existing review.\n");
+            return false;
+        }
+        
         allReviews.add(review);
+        return true;
+    }
+    
+    public Review getReviewByCustomer(Customer customer) {
+        if (customer == null) {
+            return null;
+        }
+        for (Review review : allReviews) {
+            if (review.getCustomer() != null && review.getCustomer().equals(customer)) {
+                return review;
+            }
+        }
+        return null;
+    }
+    
+    public boolean editReview(Customer customer, String newComments, int newRating) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer cannot be null.");
+        }
+        
+        Review existingReview = getReviewByCustomer(customer);
+        if (existingReview == null) {
+            System.out.print("You have not reviewed this movie yet.\n");
+            return false;
+        }
+        
+        existingReview.setComments(newComments);
+        existingReview.setRating(newRating);
+        System.out.print("Review updated successfully.\n");
+        return true;
     }
     
     public void displayReviews() {

@@ -26,7 +26,7 @@ public class CustomerTest {
         credential = new CredentialsCheck("TestPass123!");
         customer = new Customer("testcustomer", credential);
         movie = new Movie("tt1234567", "Test Movie", "Test Director", "Test Studio", "2024-01-01", "Test Description", 25);
-        review = new Review("Great movie!", 8);
+        review = new Review("Great movie!", 8, customer);
     }
 
     @Test
