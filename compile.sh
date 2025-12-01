@@ -30,4 +30,28 @@ if [ -d "movieManagement/test/users" ]; then
     fi
 fi
 
+# Compile movie tests
+if [ -d "movieManagement/test/movie" ]; then
+    MOVIE_TEST_FILES=$(find movieManagement/test/movie -name "*.java" | tr '\n' ' ')
+    if [ -n "$MOVIE_TEST_FILES" ]; then
+        javac -cp "$CLASSPATH:build/classes" -d build/test-classes $MOVIE_TEST_FILES
+    fi
+fi
+
+# Compile authentication tests
+if [ -d "movieManagement/test/authentication" ]; then
+    AUTH_TEST_FILES=$(find movieManagement/test/authentication -name "*.java" | tr '\n' ' ')
+    if [ -n "$AUTH_TEST_FILES" ]; then
+        javac -cp "$CLASSPATH:build/classes" -d build/test-classes $AUTH_TEST_FILES
+    fi
+fi
+
+# Compile payment tests
+if [ -d "movieManagement/test/payment" ]; then
+    PAYMENT_TEST_FILES=$(find movieManagement/test/payment -name "*.java" | tr '\n' ' ')
+    if [ -n "$PAYMENT_TEST_FILES" ]; then
+        javac -cp "$CLASSPATH:build/classes" -d build/test-classes $PAYMENT_TEST_FILES
+    fi
+fi
+
 echo "Compilation complete!"
