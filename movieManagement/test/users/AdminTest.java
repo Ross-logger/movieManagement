@@ -1,7 +1,7 @@
 package movieManagement.test.users;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 import movieManagement.src.movie.Movie;
 import java.util.List;
 import java.util.ArrayList;

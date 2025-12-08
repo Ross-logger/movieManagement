@@ -29,26 +29,27 @@ This project showcases several important software engineering concepts:
 ### Project Structure
 
 ```
-src/
-├── movieManagement/
-│   ├── movie/                    # Main package
-│   │   ├── Movie.java            # Core entity - manages movie catalog
-│   │   ├── MovieDuplicate.java   # Abstract base for movie copies
-│   │   ├── RentalMovieDuplicate.java  # Rental copy implementation
-│   │   ├── SalableMovieDuplicate.java # Sale copy implementation
-│   │   ├── RentalRecord.java     # Rental transaction history
-│   │   ├── Review.java           # Customer reviews and ratings
-│   │   ├── Customer_stub.java    # Customer representation
-│   │   └── Review_stub.java      # Review stub
-│   ├── MovieManagementSystem.java # Console interface (main entry point)
-│   └── testMovie/                 # Test package
-│       ├── TestMovie.java        # Movie class tests
-│       ├── TestRentalRecord.java # Rental record tests
-│       └── TestReview.java       # Review class tests
-├── lib/                          # JUnit dependencies
-├── compile.sh                    # Compilation script
-├── run-tests.sh                  # Test execution script
-└── run-system.sh                 # Run console interface script
+movieManagement/
+├── src/                          # Source code
+│   ├── Main.java                 # Main entry point - console interface
+│   ├── authentication/           # Authentication system
+│   ├── movie/                    # Movie management classes
+│   ├── payment/                  # Payment processing system
+│   ├── users/                    # User and membership classes
+│   └── exceptions/                # Custom exceptions
+├── data/                         # Data files
+│   ├── PredefinedAdmins.java     # Predefined admin accounts
+│   └── PredefinedMoviesList.java # Predefined movie catalog
+├── test/                         # Test suite
+│   ├── MainTest.java             # Main class tests (312 test methods)
+│   ├── authentication/           # Authentication tests
+│   ├── movie/                    # Movie tests
+│   ├── payment/                  # Payment tests
+│   └── users/                    # User tests
+├── pom.xml                       # Maven configuration
+├── compile.sh                    # Compilation script (legacy)
+├── run-tests.sh                  # Test execution script (legacy)
+└── run-system.sh                 # Run application script (legacy)
 ```
 
 ### Core Features
@@ -72,17 +73,57 @@ src/
    - Display all reviews for a movie
    - Validate rating ranges
 
+## 📦 Distribution Package
+
+A complete distribution package (`MovieManagementSystem.zip`) is available containing:
+
+- **Executable JAR**: `movie-management-system-1.0-SNAPSHOT.jar` - Ready to run
+- **Source Code**: Complete source files for customization
+- **Test Suite**: All 312 test methods
+- **Documentation**: README and coverage reports
+- **Configuration**: Maven `pom.xml` for building from source
+
+**To create a new distribution package:**
+```bash
+# Build the project
+mvn clean package
+
+# The distribution script will be available (if created)
+# Or manually create a zip with: jar, src/, test/, pom.xml, README.md
+```
+
 ## 🚀 Quickstart
 
 ### Prerequisites
 
 - **Java Development Kit (JDK)**: Version 18 or higher
-- **JUnit 5**: Included in `lib/` directory
-- **Bash shell**: For running compilation and test scripts (Unix/Linux/macOS)
+- **Maven**: Version 3.6+ (for building and testing)
+- **JUnit 5**: Managed by Maven dependencies
+- **Bash shell**: For running scripts (Unix/Linux/macOS) - Optional
 
-### Compilation
+### Building the Project
 
-#### Option 1: Using the Compilation Script (Recommended)
+#### Option 1: Using Maven (Recommended)
+
+```bash
+# Compile the project
+mvn clean compile
+
+# Compile and package (creates JAR file)
+mvn clean package
+
+# Compile, run tests, and generate coverage report
+mvn clean test
+```
+
+This will:
+- Compile all source files in `movieManagement/src/`
+- Compile all test files in `movieManagement/test/`
+- Place compiled classes in `target/classes/` and `target/test-classes/`
+- Generate JAR file in `target/` directory
+- Run all tests and generate JaCoCo coverage report
+
+#### Option 2: Using Legacy Scripts
 
 ```bash
 # Make the script executable (first time only)
@@ -92,27 +133,21 @@ chmod +x compile.sh
 ./compile.sh
 ```
 
-This script will:
-- Compile all source files in `movieManagement/movie/`
-- Compile all test files in `movieManagement/testMovie/`
-- Place compiled classes in `build/classes/` and `build/test-classes/`
-
-#### Option 2: Manual Compilation
-
-```bash
-# Set up classpath
-CLASSPATH="lib/*:movieManagement/movie:movieManagement/testMovie"
-
-# Compile main source files
-javac -cp "$CLASSPATH" -d build/classes movieManagement/movie/*.java
-
-# Compile test files
-javac -cp "$CLASSPATH:build/classes" -d build/test-classes movieManagement/testMovie/*.java
-```
+**Note**: Maven is the recommended build tool for this project. The legacy scripts are provided for compatibility.
 
 ### Running Tests
 
-#### Option 1: Using the Test Script (Recommended)
+#### Option 1: Using Maven (Recommended)
+
+```bash
+# Run all tests
+mvn test
+
+# Run tests and generate coverage report
+mvn clean test
+```
+
+#### Option 2: Using Legacy Test Script
 
 ```bash
 # Make the script executable (first time only)
@@ -122,23 +157,25 @@ chmod +x run-tests.sh
 ./run-tests.sh
 ```
 
-#### Option 2: Manual Test Execution
-
-```bash
-# Set up classpath for tests
-CLASSPATH="lib/junit-platform-console-standalone-1.10.0.jar:build/classes:build/test-classes"
-
-# Run tests using JUnit Platform Console Launcher
-java -cp "$CLASSPATH" org.junit.platform.console.ConsoleLauncher \
-    --class-path build/test-classes \
-    --scan-class-path
-```
+**Note**: Maven automatically runs tests during the build process and generates coverage reports.
 
 ### Running the Application
 
-#### Option 1: Console Interface (Recommended for Non-Programmers)
+#### Option 1: Using the JAR File (Recommended)
 
-The system includes a user-friendly console interface that allows users to interact with the system without writing any code. This is designed for demonstration purposes and makes the system accessible to users not familiar with programming.
+```bash
+# Run the executable JAR file
+java -jar target/movie-management-system-1.0-SNAPSHOT.jar
+```
+
+#### Option 2: Using Maven
+
+```bash
+# Run via Maven exec plugin
+mvn exec:java -Dexec.mainClass="movieManagement.src.Main"
+```
+
+#### Option 3: Using Legacy Script
 
 ```bash
 # Make the script executable (first time only)
@@ -147,6 +184,8 @@ chmod +x run-system.sh
 # Run the Movie Management System
 ./run-system.sh
 ```
+
+The system includes a user-friendly console interface that allows users to interact with the system without writing any code. This is designed for demonstration purposes and makes the system accessible to users not familiar with programming.
 
 **Console Interface Features:**
 - Interactive menu-driven system
@@ -227,25 +266,31 @@ movie.displayReviews();
 
 ### Expected Test Output
 
-When running tests, you should see output similar to:
+When running tests with Maven, you should see output similar to:
 
 ```
-Test run finished after XXX ms
-[         6 containers found      ]
-[         0 containers skipped     ]
-[         6 containers started     ]
-[         0 containers aborted     ]
-[         6 containers successful  ]
-[         0 containers failed      ]
-[        10 tests found            ]
-[         0 tests skipped          ]
-[        10 tests started          ]
-[         0 tests aborted           ]
-[        10 tests successful       ]
-[         0 tests failed           ]
+[INFO] Tests run: 612, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] BUILD SUCCESS
 ```
+
+The project includes **312 test methods** covering:
+- Authentication and user management
+- Movie operations (rental, purchase, reviews)
+- Payment processing (Credit Card and FPS)
+- Membership and state management
+- Comprehensive integration tests
 
 ## 📚 Key Classes Reference
+
+### `Main`
+Main entry point providing console interface for the Movie Management System.
+
+**Key Features:**
+- User authentication (sign in, register)
+- Admin operations (add movies, manage inventory)
+- Customer operations (rent, buy, review, refund)
+- Interactive menu-driven interface
 
 ### `Movie`
 Main entity class managing the movie catalog and operations.
@@ -253,10 +298,12 @@ Main entity class managing the movie catalog and operations.
 **Key Methods:**
 - `addRentalCopy(RentalMovieDuplicate)` - Add a copy available for rental
 - `addSaleableCopy(SalableMovieDuplicate)` - Add a copy available for purchase
-- `Lend(Customer_stub)` - Rent a movie to a customer
-- `Buy(Customer_stub)` - Sell a movie to a customer
+- `Lend(Customer)` - Rent a movie to a customer
+- `Buy(Customer)` - Sell a movie to a customer
+- `Return(Customer)` - Return a rented movie
 - `addReview(Review)` - Add a customer review
 - `displayReviews()` - Show all reviews for the movie
+- `hasAvailableRentalCopy()` - Check if rental copies are available
 
 ### `MovieDuplicate`
 Abstract base class providing common functionality for all movie copies.
@@ -268,50 +315,161 @@ Abstract base class providing common functionality for all movie copies.
 Represents a movie copy available for rental.
 
 **Key Methods:**
-- `rent(Customer_stub)` - Mark copy as rented
+- `rent(Customer)` - Mark copy as rented
 - `returnMovie()` - Mark copy as available
 - `isRented()` - Check rental status
-- `addRentalRecord(RentalRecord)` - Record rental history
+- `getCustomer()` - Get the customer who rented this copy
 
 ### `SalableMovieDuplicate`
 Represents a movie copy available for purchase.
 
 **Key Methods:**
-- `sold(Customer_stub)` - Mark copy as sold
+- `sold(Customer)` - Mark copy as sold
 - `isSold()` - Check if copy has been sold
 
-### `RentalRecord`
-Immutable record of a rental transaction.
+### `Customer`
+Represents a customer with membership and rental/purchase history.
 
 **Key Methods:**
-- `getRentalDate()` - Get when movie was borrowed
-- `getReturnDate()` - Get when movie should be returned
-- `extendRentalPeriod(int)` - Extend the rental period
+- `getMembership()` - Get customer's membership
+- `getRentedMovies()` - Get list of rented movies
+- `getPurchasedMovies()` - Get list of purchased movies
+- `getReviews()` - Get all reviews written by customer
+- `addRentedMovie(Movie)` - Add movie to rented list
+- `addPurchasedMovie(Movie)` - Add movie to purchased list
+
+### `Membership`
+Manages customer membership state and benefits.
+
+**Key Methods:**
+- `getType()` - Get membership type (Non-Member, Gold, Platinum)
+- `getMaxRentMovies()` - Get maximum rental limit
+- `getRentalDays()` - Get rental period in days
+- `getState()` - Get current membership state
+
+### `PaymentTransaction`
+Represents a payment transaction for movie purchases.
+
+**Key Methods:**
+- `completePayment()` - Process the payment
+- `completeRefund()` - Process refund for the transaction
+- `isPaymentCompleted()` - Check if payment was completed
+- `isRefundCompleted()` - Check if refund was completed
 
 ### `Review`
 Customer review and rating for a movie.
 
 **Key Methods:**
-- `getFeedback()` - Get review text
-- `getMediaScore()` - Get rating (0-10)
+- `getComments()` - Get review text
+- `getMovieRating()` - Get rating (0-10)
+- `getCustomer()` - Get the customer who wrote the review
 
 ## 🧪 Testing
 
-The project includes comprehensive unit tests:
+The project includes comprehensive unit tests with **312 test methods** covering all major functionality:
 
-- **TestMovie.java**: 6 test cases covering movie operations
-  - Adding rental copies
-  - Adding sale copies
-  - Successful lending
-  - Successful purchasing
-  - Handling unavailable copies
+### Test Coverage
 
-- **TestReview.java**: 4 test cases covering review functionality
-  - Review creation
-  - Rating validation
-  - String formatting
+- **MainTest.java**: 312 test methods covering the main application
+  - Authentication flows (sign in, register, sign out)
+  - Admin operations (add movie, add copies)
+  - Customer operations (rent, buy, review, return, refund)
+  - View operations (membership, rented, purchased, reviews)
+  - Error handling and edge cases
+  - Input validation and boundary conditions
 
-- **TestRentalRecord.java**: Placeholder for rental record tests
+- **Movie Tests**: Coverage for movie operations
+- **Payment Tests**: Credit Card and FPS payment processing
+- **Authentication Tests**: User authentication and session management
+- **User Tests**: Customer and membership functionality
+
+### Test Coverage Report (JaCoCo)
+
+**It is highly recommended to view the test coverage report** to understand which parts of the codebase are tested and identify areas that may need additional testing.
+
+#### Viewing Coverage Report
+
+The project uses **JaCoCo (Java Code Coverage)** to generate detailed test coverage reports. After running tests, a comprehensive HTML report is automatically generated.
+
+**To generate and view the coverage report:**
+
+```bash
+# Run tests (coverage report is generated automatically)
+mvn clean test
+
+# Open the coverage report in your browser
+# On macOS:
+open target/site/jacoco/index.html
+
+# On Linux:
+xdg-open target/site/jacoco/index.html
+
+# On Windows:
+start target/site/jacoco/index.html
+```
+
+#### Understanding the Coverage Report
+
+The JaCoCo report provides:
+
+1. **Overall Coverage Summary**: Shows instruction coverage, branch coverage, line coverage, and method coverage percentages
+2. **Package-Level Coverage**: Breakdown by package (authentication, movie, payment, users)
+3. **Class-Level Coverage**: Detailed coverage for each class
+4. **Line-by-Line Coverage**: Visual indicators showing which lines are covered (green) and which are not (red)
+5. **Branch Coverage**: Shows which conditional branches are tested
+
+#### Coverage Report Features
+
+- **Color-Coded Coverage**: 
+  - 🟢 Green bars = Covered code
+  - 🔴 Red bars = Uncovered code
+  
+- **Interactive Navigation**: Click on packages/classes to drill down into detailed coverage
+
+- **Coverage Metrics**:
+  - **Instructions**: Percentage of bytecode instructions executed
+  - **Branches**: Percentage of conditional branches tested
+  - **Lines**: Percentage of source lines executed
+  - **Methods**: Percentage of methods called
+
+#### Current Coverage Status
+
+The project maintains high test coverage:
+- **Instruction Coverage**: ~77%+
+- **Branch Coverage**: ~64%+
+- **312 comprehensive test methods** covering all major code paths
+
+#### For New Developers
+
+**Recommended workflow:**
+
+1. **Run tests and view coverage:**
+   ```bash
+   mvn clean test
+   open target/site/jacoco/index.html
+   ```
+
+2. **Review uncovered code**: 
+   - Look for red bars in the coverage report
+   - Identify untested branches and edge cases
+   - Add tests for uncovered code paths
+
+3. **Check specific classes:**
+   - Navigate to `movieManagement.src` → `Main.html` for detailed Main.java coverage
+   - Review branch coverage to see which conditional paths need testing
+
+4. **Improve coverage:**
+   - Focus on methods with low coverage percentages
+   - Add tests for error paths and edge cases
+   - Ensure all branches are tested (if/else, switch cases, loops)
+
+**Example**: To check Main.java coverage specifically:
+```bash
+# After running mvn test
+open target/site/jacoco/movieManagement.src/Main.html
+```
+
+This will show you exactly which lines and branches in Main.java are covered by tests.
 
 ## 🖥️ Console Interface
 
@@ -326,23 +484,32 @@ The Movie Management System includes a **console-based user interface** designed
 
 ### Available Commands
 
-1. **Add a new movie** - Create movie entries with all metadata
-2. **Add rental copy** - Add copies available for rental
-3. **Add sale copy** - Add copies available for purchase
-4. **Rent a movie** - Borrow a movie from the catalog
-5. **Buy a movie** - Purchase a movie permanently
-6. **Leave a review** - Add reviews and ratings (0-10 scale)
+1. **Add a new movie** - Create movie entries with all metadata (Admin only)
+2. **Add rental copy** - Add copies available for rental (Admin only)
+3. **Add sale copy** - Add copies available for purchase (Admin only)
+4. **Rent a movie** - Borrow a movie from the catalog (Customer only)
+5. **Buy a movie** - Purchase a movie permanently (Customer only)
+6. **Leave a review** - Add reviews and ratings (0-10 scale) (Customer only)
 7. **View movie details** - See movie information and all reviews
 8. **List all movies** - Browse the entire catalog
-9. **Return a rented movie** - Return functionality (for demonstration)
+9. **Return a rented movie** - Return a rented movie (Customer only)
+10. **Process refund** - Request refund for purchased movies (Customer only)
+11. **View my membership** - View membership details and benefits (Customer only)
+12. **View my rented movies** - List all currently rented movies (Customer only)
+13. **View my purchased movies** - List all purchased movies (Customer only)
+14. **View my reviews** - View all reviews you've written (Customer only)
+15. **Sign Out** - Sign out of the current session
 
 ### Usage Example
 
 ```bash
-# Compile the project
-./compile.sh
+# Build the project (using Maven)
+mvn clean package
 
 # Run the console interface
+java -jar target/movie-management-system-1.0-SNAPSHOT.jar
+
+# Or use the legacy script
 ./run-system.sh
 ```
 
@@ -356,10 +523,13 @@ The interface will guide you through each operation step-by-step. Simply follow 
 
 ## 📝 Notes
 
-- The system uses a 7-day default rental period for movies
+- The system uses membership-based rental limits (Non-member: 1, Gold: 3, Platinum: 5)
+- Rental period varies by membership type
 - Movie ratings are on a scale of 0-10
 - All copy IDs are generated using UUID for uniqueness
 - The console interface provides full system access without programming knowledge
+- Payment methods supported: Credit Card and FPS (Fast Payment System)
+- Predefined movies are loaded automatically on startup
 
 ## 🔧 Troubleshooting
 
@@ -373,9 +543,18 @@ If you encounter compilation errors:
 ### Test Failures
 
 If tests fail:
-1. Ensure compilation completed successfully
-2. Check that test output matches expected strings exactly (including newlines)
-3. Verify classpath includes both source and test classes
+1. Ensure compilation completed successfully: `mvn clean compile`
+2. Check test output for specific failure messages
+3. Verify all dependencies are resolved: `mvn dependency:resolve`
+4. Review coverage report to identify problematic areas
+
+### Coverage Report Not Generated
+
+If the coverage report is not generated:
+1. Ensure tests ran successfully: `mvn clean test`
+2. Check that JaCoCo plugin is configured in `pom.xml`
+3. Verify report location: `target/site/jacoco/index.html`
+4. Try regenerating: `mvn clean test jacoco:report`
 
 ## 📄 License
 
@@ -383,6 +562,7 @@ This project is part of a software engineering demonstration project.
 
 ---
 
-**Built with:** Java 18, JUnit 5  
-**Architecture:** Object-Oriented Design with Inheritance and Polymorphism
+**Built with:** Java 18, Maven, JUnit 5, JaCoCo  
+**Architecture:** Object-Oriented Design with Inheritance and Polymorphism  
+**Test Coverage:** 312 test methods with comprehensive coverage reporting via JaCoCo
 

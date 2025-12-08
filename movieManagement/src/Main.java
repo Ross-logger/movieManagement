@@ -18,9 +18,16 @@ import movieManagement.src.users.Membership;
 public class Main {
     private static List<Movie> movies = new ArrayList<>();
     private static List<PaymentTransaction> transactions = new ArrayList<>();
-    private static Scanner scanner = new Scanner(System.in);
+    private static Scanner scanner = null;
     private static User currentUser = null;
     private static AuthService authService = AuthService.getInstance();
+    
+    private static Scanner getScanner() {
+        if (scanner == null) {
+            scanner = new Scanner(System.in);
+        }
+        return scanner;
+    }
 
     public static void main(String[] args) {
         System.out.println("========================================");
@@ -97,7 +104,17 @@ public class Main {
                 }
             }
         }
-        scanner.close();
+        // Don't close scanner here as it closes System.in which breaks testing
+        // Scanner will be reset in resetState() if needed
+    }
+
+    // Reset method for testing purposes
+    public static void resetState() {
+        movies.clear();
+        transactions.clear();
+        currentUser = null;
+        scanner = null; // Reset scanner so it can be recreated
+        // AuthService state is managed separately
     }
 
     private static boolean handleAuthentication() {
@@ -651,13 +668,13 @@ public class Main {
 
     private static String getStringInput(String prompt) {
         System.out.print(prompt);
-        return scanner.nextLine().trim();
+        return getScanner().nextLine().trim();
     }
 
     private static int getIntInput(String prompt) {
         while (true) {
             System.out.print(prompt);
-            String input = scanner.nextLine().trim();
+            String input = getScanner().nextLine().trim();
             try {
                 return Integer.parseInt(input);
             } catch (NumberFormatException e) {
@@ -670,7 +687,7 @@ public class Main {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         while (true) {
             System.out.print(prompt);
-            String input = scanner.nextLine().trim();
+            String input = getScanner().nextLine().trim();
             
             if (!input.matches("\\d{4}-\\d{2}-\\d{2}")) {
                 System.out.println("✗ Invalid date format. Please use YYYY-MM-DD format (e.g., 1994-09-23)");
