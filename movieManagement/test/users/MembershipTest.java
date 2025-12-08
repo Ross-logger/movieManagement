@@ -1,14 +1,14 @@
 package movieManagement.test.users;
 
 import movieManagement.src.users.*;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MembershipTest {
     private Membership membership;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         membership = new Membership();
     }
